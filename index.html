@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFA to DFA Converter — Subset Construction Visualizer</title>
+  <meta name="description" content="Interactive NFA to DFA conversion using the Subset Construction method with step-by-step visualization, transition tables, and educational explanations." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- vis-network CDN -->
+  <script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+
+  <!-- Project CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ═══════════════════ HEADER ═══════════════════ -->
+  <header class="hero">
+    <div class="hero__badge">Theory of Automata &amp; Formal Languages</div>
+    <h1 class="hero__title">NFA → DFA <span class="hero__accent">Converter</span></h1>
+    <p class="hero__subtitle">Subset Construction Method — Step-by-Step Visualization</p>
+  </header>
+
+  <main class="app">
+
+    <!-- ═══════════════════ INPUT PANEL ═══════════════════ -->
+    <section class="card card--input" id="inputPanel">
+      <h2 class="card__heading"><span class="icon">⚙️</span> Define Your NFA</h2>
+
+      <form id="nfaForm" autocomplete="off">
+        <div class="field">
+          <label for="inputStates">States <span class="field__hint">(comma-separated)</span></label>
+          <input type="text" id="inputStates" placeholder="e.g. q0, q1, q2" spellcheck="false" />
+        </div>
+
+        <div class="field">
+          <label for="inputAlphabet">Alphabet <span class="field__hint">(comma-separated, use <code>eps</code> for ε)</span></label>
+          <input type="text" id="inputAlphabet" placeholder="e.g. a, b" spellcheck="false" />
+        </div>
+
+        <div class="field">
+          <label for="inputTransitions">
+            Transitions
+            <span class="field__hint">(one per line: <code>source, symbol, dest</code> — use <code>eps</code> for ε)</span>
+          </label>
+          <textarea id="inputTransitions" rows="6" placeholder="q0, a, q0&#10;q0, a, q1&#10;q0, eps, q1&#10;q1, b, q2" spellcheck="false"></textarea>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="inputStart">Start State</label>
+            <input type="text" id="inputStart" placeholder="e.g. q0" spellcheck="false" />
+          </div>
+          <div class="field">
+            <label for="inputAccept">Accept / Final States <span class="field__hint">(comma-separated)</span></label>
+            <input type="text" id="inputAccept" placeholder="e.g. q2" spellcheck="false" />
+          </div>
+        </div>
+
+        <div id="errorBox" class="error-box" hidden></div>
+
+        <div class="btn-group">
+          <button type="button" id="btnLoadExample" class="btn btn--ghost" title="Load a sample NFA">
+            📂 Load Example
+          </button>
+          <button type="submit" id="btnConvert" class="btn btn--primary" title="Parse NFA and begin conversion">
+            🚀 Convert
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ═══════════════════ STEP CONTROLS ═══════════════════ -->
+    <section class="card card--controls" id="controlPanel" hidden>
+      <h2 class="card__heading"><span class="icon">▶️</span> Step Controls</h2>
+      <div class="btn-group btn-group--controls">
+        <button type="button" id="btnNextStep" class="btn btn--accent">⏭️ Next Step</button>
+        <button type="button" id="btnAutoPlay" class="btn btn--outline">▶️ Auto Play</button>
+        <button type="button" id="btnReset" class="btn btn--danger">🔄 Reset</button>
+      </div>
+      <div class="step-counter" id="stepCounter">Step 0 / 0</div>
+    </section>
+
+    <!-- ═══════════════════ GRAPH CANVASES ═══════════════════ -->
+    <section class="graph-section" id="graphSection" hidden>
+      <div class="graph-container">
+        <h3 class="graph-label">NFA Graph</h3>
+        <div class="graph-canvas" id="nfaCanvas"></div>
+      </div>
+      <div class="graph-container">
+        <h3 class="graph-label">DFA Graph</h3>
+        <div class="graph-canvas" id="dfaCanvas"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ STEP-BY-STEP EXPLANATION ═══════════════════ -->
+    <section class="card card--explanation" id="explanationPanel" hidden>
+      <h2 class="card__heading"><span class="icon">📖</span> Step-by-Step Explanation</h2>
+      <div id="step-explanation" class="explanation-content">
+        <p class="explanation-placeholder">Click <strong>Next Step</strong> to begin the subset construction walkthrough.</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════ DFA TRANSITION TABLE ═══════════════════ -->
+    <section class="card card--table" id="tablePanel" hidden>
+      <h2 class="card__heading"><span class="icon">📊</span> DFA Transition Table</h2>
+      <div class="table-wrapper" id="tableWrapper">
+        <table id="dfaTransitionTable">
+          <thead><tr><th>DFA State</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════════ FOOTER ═══════════════════ -->
+  <footer class="footer">
+    <p>NFA → DFA Subset Construction Visualizer &bull; Made by Ayush Singh(2024UCD2170) &bull; TAFL</p>
+  </footer>
+
+  <!-- ═══════════════════ SCRIPTS (order matters) ═══════════════════ -->
+  <script src="js/engine.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/controller.js"></script>
+</body>
+</html>
